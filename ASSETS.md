@@ -6,3 +6,5 @@
 - **Couleurs** : adaptation sombre et accents vert clair choisis pour GENBI. Aucun code couleur n'est présenté comme une valeur officielle de la charte OCP.
 
 Le site institutionnel OCP a refusé l'inspection automatisée (403). Le logo et les références agricoles ancrent la proposition ; une validation avec la charte client reste possible avant intégration finale.
+
+- **Fond de carte du Maroc** : contour vectoriel simplifié depuis Natural Earth, Admin 0 – Countries (1:50m), champ `ADM0_A3=MAR`. Source : https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_50m_admin_0_countries.geojson . Données cartographiques du domaine public : https://www.naturalearthdata.com/about/terms-of-use/ . Le contour est intégré à `dist/story.js`. La couche de chaleur, les régions mises en avant et les valeurs de précipitations sont une démonstration fictive, sans source météorologique.

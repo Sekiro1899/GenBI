@@ -18,6 +18,8 @@ Les routes `#/`, `#/connexion`, `#/inscription` et `#/a-propos` fonctionnent sur
 
 Les formulaires sont explicitement en mode démonstration. « Remplir avec un exemple » ajoute des données fictives ; l'envoi affiche une confirmation de simulation. Aucun compte, session, cookie ou stockage de mot de passe n'est créé. Les données des graphiques sont fictives.
 
+L’accueil anime la génération d’un rapport de ventes. La section À propos déroule un exemple de pluviométrie en quatre étapes : saisie d’une question, écriture SQL, réponse et carte de chaleur. Chaque illustration démarre à son entrée dans l’écran et dispose d’un bouton Rejouer. Les animations automatiques respectent la préférence de mouvement réduit. Le bouton Épingler simule uniquement l’ajout de la carte au rapport dans la page courante : aucune donnée n’est enregistrée et aucune requête SQL n’est exécutée. Le scénario se trouve dans `dist/story.js`.
+
 ## Raccorder l'authentification existante
 
 Modifier `dist/config.js` : passer `mode` à `live`, définir `dashboardUrl` (par exemple `/dashboard`) et remplacer `authAdapter = null` par un objet exposant `signIn({ email, password })` et `signUp({ name, email, password })`.
