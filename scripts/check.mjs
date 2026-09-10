@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const files = ['dist/index.html', 'dist/styles.css', 'dist/app.js', 'dist/auth.js', 'dist/config.js', 'dist/assets/favicon.svg', 'dist/assets/fields.jpg', 'dist/assets/ocp-logo.png'];
+const files = ['dist/index.html', 'dist/styles.css', 'dist/app.js', 'dist/story.js', 'dist/auth.js', 'dist/config.js', 'dist/assets/favicon.svg', 'dist/assets/fields.jpg', 'dist/assets/ocp-logo.png'];
 for (const file of files) {
   const full = path.join(root, file);
   if (!(await stat(full)).size) throw new Error(`Empty file: ${file}`);
