@@ -1,4 +1,5 @@
 import { config, authAdapter } from './config.js';
+import { rainfallStory, animateRainfallStory } from './story.js';
 import { validate, authenticate, dashboardDestination } from './auth.js';
 
 const app = document.querySelector('#app');
@@ -13,10 +14,14 @@ const icons = {
   layers: '<path d="m12 3 10 6-10 6L2 9ZM2 13l10 6 10-6M2 17l10 6 10-6"/>',
   check: '<path d="m5 12 4 4L19 6"/>',
   close: '<path d="m6 6 12 12M18 6 6 18"/>',
+  replay: '<path d="M3 10a9 9 0 1 1 2 8M3 4v6h6"/>',
+  pause: '<path d="M9 5v14M15 5v14"/>',
+  play: '<path d="m8 5 11 7-11 7Z"/>',
   down: '<path d="M12 4v16m-6-6 6 6 6-6"/>',
 };
 const icon = (name, cls = '') => `<svg class="icon ${cls}" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || icons.arrow}</svg>`;
 const logo = () => '<a class="wordmark" href="#/" aria-label="GENBI, accueil">GEN<span>BI</span><span class="wordmark-period">.</span></a>';
+const platformLogo = () => '<a class="wordmark platform-wordmark" href="#/" aria-label="GenBI Platform, accueil">GenBI <span class="platform-label">Platform</span></a>';
 const ocp = () => '<div class="client-brand"><span>Une plateforme pour</span><img src="./assets/ocp-logo.png" alt="OCP" width="160" height="50" /></div>';
 
 function lineChart(id = 'hero') {
@@ -27,19 +32,113 @@ function reportCard(id = 'hero') {
   return `<article class="report-card glass-panel"><div class="report-heading"><div class="report-title"><span class="report-symbol">${icon('report')}</span><div><h3>Évolution des volumes</h3><p>Janvier – Juin 2026</p></div></div><span class="report-dots" aria-hidden="true">•••</span></div><div class="report-metric"><strong>742<span>kt</span></strong><span class="trend">${icon('diagonal')} 12,8 %</span></div><p class="metric-caption">Volume total · par rapport au semestre précédent</p>${lineChart(id)}<div class="chart-legend"><span><i></i>2026</span><span><i class="previous"></i>2025</span><span class="unit">Volumes en kt</span></div></article>`;
 }
 
-function regionCard() {
-  return `<article class="region-card glass-panel"><div class="small-card-heading"><span>Volumes par région</span>${icon('diagonal')}</div><div class="region-row"><span>Afrique</span><div><i style="--bar:84%"></i></div><strong>42 %</strong></div><div class="region-row"><span>Europe</span><div><i style="--bar:56%"></i></div><strong>28 %</strong></div><div class="region-row"><span>Asie</span><div><i style="--bar:40%"></i></div><strong>20 %</strong></div><div class="region-row"><span>Amériques</span><div><i style="--bar:20%"></i></div><strong>10 %</strong></div></article>`;
+function salesReport() {
+  return `<article class="sales-report glass-panel" aria-label="Exemple de rapport de ventes"><div class="report-skeleton" aria-hidden="true"><span></span><span></span><div></div><p>Votre rapport se prépare</p></div><div class="sales-content"><div class="report-heading"><div class="report-title"><span class="report-symbol">${icon('report')}</span><div><h3>Évolution des ventes</h3><p>Janvier – Juin 2026</p></div></div><span class="generated-badge">${icon('check')} Généré</span></div><div class="sales-kpis"><div><span>Ventes cumulées</span><strong><span data-sales-total>10,35</span><small>M MAD</small></strong></div><div><span>Janvier → Juin</span><strong class="sales-growth">+100<small>%</small></strong></div></div><div class="sales-chart" role="img" aria-label="Ventes mensuelles fictives en millions de dirhams : janvier 1,2 ; février 1,5 ; mars 1,35 ; avril 1,8 ; mai 2,1 ; juin 2,4. Total : 10,35 millions de dirhams."><div class="sales-y-axis"><span>2,4</span><span>1,8</span><span>1,2</span></div><svg viewBox="0 0 460 165" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="sales-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c4d87f" stop-opacity=".3"/><stop offset="100%" stop-color="#c4d87f" stop-opacity="0"/></linearGradient><clipPath id="sales-reveal"><rect class="chart-reveal" x="0" y="0" width="460" height="165"/></clipPath></defs><g class="chart-grid"><path d="M0 12H460M0 76H460M0 140H460"/></g><g clip-path="url(#sales-reveal)"><path d="M0 140L92 108L184 124L276 76L368 44L460 12V165H0Z" fill="url(#sales-area)"/><path class="sales-line" d="M0 140L92 108L184 124L276 76L368 44L460 12"/><g class="sales-points"><circle cx="0" cy="140" r="3"/><circle cx="92" cy="108" r="3"/><circle cx="184" cy="124" r="3"/><circle cx="276" cy="76" r="3"/><circle cx="368" cy="44" r="3"/><circle cx="460" cy="12" r="4"/></g></g></svg><div class="x-axis"><span>Jan.</span><span>Fév.</span><span>Mars</span><span>Avr.</span><span>Mai</span><span>Juin</span></div></div><div class="sales-chart-footer"><span><i></i>Ventes mensuelles</span><span>En millions de MAD</span></div></div></article>`;
+}
+
+function generationPreview() {
+  return `<div class="generation-stage" data-phase="question" style="--chart-progress:0"><div class="stage-orbit" aria-hidden="true"></div><div class="generation-question glass-panel"><div class="question-label">${icon('layers')} VOTRE QUESTION</div><p><span class="sr-only">Comment ont évolué les ventes sur les six derniers mois ?</span><span class="typed-question" aria-hidden="true"></span><span class="typing-caret" aria-hidden="true"></span></p><span class="generation-send" aria-hidden="true">${icon('arrow')}</span></div><div class="generation-pipeline" aria-hidden="true"><span data-step="question"><i></i>Question</span><span data-step="sql"><i></i>Requête SQL</span><span data-step="execution"><i></i>Analyse</span><span data-step="report"><i></i>Rapport</span></div><p class="generation-status" role="status" aria-atomic="true">Posez votre question en langage naturel.</p>${salesReport()}<div class="sales-insight glass-panel"><span class="insight-check">${icon('check')}</span><p>Les ventes ont doublé<span>entre janvier et juin.</span></p><span class="insight-value">×2</span></div><div class="generation-controls"><p>Exemple animé · Données de démonstration</p><button type="button" class="animation-control" aria-label="Mettre l’animation en pause">${icon('pause')}<span>Pause</span></button></div></div>`;
+}
+
+let stopHeroAnimation = () => {};
+let stopRainfallStory = () => {};
+function animateGeneration() {
+  const stage = document.querySelector('.generation-stage');
+  const typed = stage.querySelector('.typed-question');
+  const status = stage.querySelector('.generation-status');
+  const total = stage.querySelector('[data-sales-total]');
+  const control = stage.querySelector('.animation-control');
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const question = 'Comment ont évolué les ventes sur les six derniers mois ?';
+  const duration = 9400;
+  let elapsed = 0;
+  let lastTime = null;
+  let frame = 0;
+  let paused = false;
+  let stopped = false;
+  const steps = ['question', 'sql', 'execution', 'report'];
+  const messages = {
+    question: 'Posez votre question en langage naturel.',
+    sql: 'La question est transcrite en requête SQL.',
+    execution: 'La requête s’exécute · 6 mois de ventes analysés.',
+    report: 'Les résultats prennent forme dans votre rapport.',
+    complete: 'Votre rapport est prêt.'
+  };
+  function paint() {
+    const phase = elapsed < 2500 ? 'question' : elapsed < 4300 ? 'sql' : elapsed < 6100 ? 'execution' : elapsed < duration ? 'report' : 'complete';
+    typed.textContent = question.slice(0, Math.floor(Math.min(1, elapsed / 1900) * question.length));
+    if (stage.dataset.phase !== phase) {
+      stage.dataset.phase = phase;
+      status.textContent = messages[phase];
+    }
+    const progress = Math.max(0, Math.min(1, (elapsed - 6300) / 2500));
+    stage.style.setProperty('--chart-progress', progress);
+    total.textContent = (10.35 * progress).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const current = phase === 'complete' ? 4 : steps.indexOf(phase);
+    stage.querySelectorAll('[data-step]').forEach((step, index) => {
+      step.classList.toggle('is-active', index === current);
+      step.classList.toggle('is-done', index < current);
+    });
+  }
+  function updateControl() {
+    const done = elapsed >= duration;
+    control.innerHTML = `${icon(done ? 'replay' : paused ? 'play' : 'pause')}<span>${done ? 'Rejouer' : paused ? 'Reprendre' : 'Pause'}</span>`;
+    control.setAttribute('aria-label', done ? 'Rejouer l’animation' : paused ? 'Reprendre l’animation' : 'Mettre l’animation en pause');
+    stage.classList.toggle('is-paused', paused);
+  }
+  function tick(time) {
+    frame = 0;
+    if (stopped || paused || document.hidden) { lastTime = null; return; }
+    if (lastTime !== null) elapsed = Math.min(duration, elapsed + time - lastTime);
+    lastTime = time;
+    paint();
+    if (elapsed < duration) frame = requestAnimationFrame(tick);
+    else updateControl();
+  }
+  function schedule() {
+    lastTime = null;
+    if (!frame && !stopped && !paused && !document.hidden && elapsed < duration) frame = requestAnimationFrame(tick);
+  }
+  function onControl() {
+    if (elapsed >= duration) { elapsed = 0; paused = false; paint(); }
+    else paused = !paused;
+    updateControl();
+    if (paused) { cancelAnimationFrame(frame); frame = 0; lastTime = null; }
+    else schedule();
+  }
+  function onVisibility() {
+    if (document.hidden) { cancelAnimationFrame(frame); frame = 0; lastTime = null; }
+    else schedule();
+  }
+  function onMotion() {
+    if (motion.matches) {
+      cancelAnimationFrame(frame); frame = 0; elapsed = duration; paused = false; paint(); updateControl();
+    }
+  }
+  control.addEventListener('click', onControl);
+  document.addEventListener('visibilitychange', onVisibility);
+  motion.addEventListener('change', onMotion);
+  if (motion.matches) onMotion();
+  else { paint(); schedule(); }
+  stopHeroAnimation = () => {
+    stopped = true;
+    cancelAnimationFrame(frame);
+    control.removeEventListener('click', onControl);
+    document.removeEventListener('visibilitychange', onVisibility);
+    motion.removeEventListener('change', onMotion);
+  };
 }
 
 function home() {
-  document.title = 'GENBI — Prenez possession de vos données';
+  document.title = 'GenBI Platform — Débloquer le potentiel de vos données';
   document.body.className = 'home-page';
-  app.innerHTML = `<header class="site-header"><div class="header-inner">${logo()}<nav aria-label="Navigation principale"><a class="nav-about" href="#/a-propos">À propos</a><a class="nav-login" href="#/connexion">Se connecter</a><a class="button button-glass nav-signup" href="#/inscription">S’inscrire ${icon('diagonal')}</a></nav></div></header>
-  <main id="main"><section class="hero" aria-labelledby="hero-title"><div class="landscape" aria-hidden="true"></div><div class="hero-content"><div class="hero-copy"><span class="eyebrow"><span class="eyebrow-line"></span>GENBI</span><h1 id="hero-title">Prenez possession<br>de vos <em>données.</em></h1><p class="hero-description">Générez vos rapports<br>avec flexibilité.</p><div class="hero-actions"><a class="button button-primary" href="#/inscription">S’inscrire ${icon('arrow')}</a><a class="button button-outline" href="#/connexion">Se connecter</a></div></div>
-  <div class="report-stage" aria-label="Aperçus de rapports, données de démonstration"><div class="stage-orbit" aria-hidden="true"></div><div class="floating-main">${reportCard()}</div><div class="floating-region">${regionCard()}</div><div class="question-card glass-panel"><span class="question-symbol">${icon('layers')}</span><span>Quelle est l’évolution des volumes ?</span><span class="question-send">${icon('arrow')}</span></div><p class="demo-caption">Aperçu de rapport · Données de démonstration</p></div></div>
+  app.innerHTML = `<header class="site-header"><div class="header-inner">${platformLogo()}<nav aria-label="Navigation principale"><a class="nav-about" href="#/a-propos">À propos</a><a class="nav-login" href="#/connexion">Se connecter</a><a class="button button-glass nav-signup" href="#/inscription">S’inscrire ${icon('diagonal')}</a></nav></div></header>
+  <main id="main"><section class="hero" aria-labelledby="hero-title"><div class="landscape" aria-hidden="true"></div><div class="hero-content"><div class="hero-copy"><span class="eyebrow"><span class="eyebrow-line"></span>GENBI</span><h1 id="hero-title">Débloquer le potentiel de vos <em>données.</em></h1><p class="hero-description">Générez des rapports précis<br>en toute flexibilité.</p><div class="hero-actions"><a class="button button-primary" href="#/inscription">S’inscrire ${icon('arrow')}</a><a class="button button-outline" href="#/connexion">Se connecter</a></div></div>${generationPreview()}</div>
   <div class="hero-bottom">${ocp()}<a class="discover-link" href="#/a-propos">À propos de GENBI <span>${icon('down')}</span></a><span class="hero-index">01 — 02</span></div></section>
-  <section class="about-section" id="a-propos" aria-labelledby="about-title"><div class="about-copy"><span class="eyebrow"><span class="eyebrow-line"></span>À PROPOS DE GENBI</span><h2 id="about-title">Un rapport dédié pour chaque question que vous vous posez.</h2><p>Posez vos questions en langage naturel et générez des rapports adaptés à vos besoins.</p><a class="text-link" href="#/inscription">Créer mon compte ${icon('arrow')}</a></div><div class="about-report"><div class="about-question">${icon('report')}<span>Quelle est la répartition des volumes par région ?</span></div><div class="about-chart"><div class="donut" role="img" aria-label="Données de démonstration : Afrique 42 %, Europe 28 %, Asie 20 %, Amériques 10 %"><div><strong>742<span>kt</span></strong><span>Volume total</span></div></div><div class="donut-legend"><div><i></i><span>Afrique</span><strong>42 %</strong></div><div><i></i><span>Europe</span><strong>28 %</strong></div><div><i></i><span>Asie</span><strong>20 %</strong></div><div><i></i><span>Amériques</span><strong>10 %</strong></div></div></div><div class="about-report-footer"><span>Janvier – Juin 2026</span><span>Données de démonstration</span></div></div></section></main>
-  <footer class="site-footer">${logo()}<span>GENBI · OCP</span><a href="#/connexion">Se connecter ${icon('diagonal')}</a></footer>`;
+  <section class="about-section process-section" id="a-propos" aria-labelledby="about-title"><div class="about-copy"><span class="eyebrow"><span class="eyebrow-line"></span>À PROPOS DE GENBI</span><h2 id="about-title">La Data Visualisation <em>autrement.</em></h2><p>Un rapport dédié pour chaque question que vous vous posez.</p><a class="text-link" href="#/inscription">Créer mon compte ${icon('arrow')}</a></div>${rainfallStory()}</section></main>
+  <footer class="site-footer">${platformLogo()}<span>GENBI · OCP</span><a href="#/connexion">Se connecter ${icon('diagonal')}</a></footer>`;
+  animateGeneration();
+  stopRainfallStory = animateRainfallStory();
 }
 
 function field(name, label, type, autocomplete, placeholder, hint = '') {
@@ -125,6 +224,8 @@ function route({ initial = false } = {}) {
     document.querySelector('#a-propos').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
     return;
   }
+  stopHeroAnimation();
+  stopRainfallStory();
   renderVersion++;
   if (path === '/connexion') authScreen('login');
   else if (path === '/inscription') authScreen('signup');
